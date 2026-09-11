@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 function App() {
   const [inputText, setInputText] = useState('')
   const [phoneList, setPhoneList] = useState([])
-  const [copiedIndex, setCopiedIndex] = useState(null)
+  const [copiedIndices, setCopiedIndices] = useState(new Set())
 
   const handleCreateList = () => {
     // Split by new line, remove empty lines and trim spaces
@@ -12,14 +12,12 @@ function App() {
       .map(line => line.trim())
       .filter(line => line.length > 0)
     setPhoneList(numbers)
+    setCopiedIndices(new Set())
   }
 
   const handleCopy = (number, index) => {
     navigator.clipboard.writeText(number).then(() => {
-      setCopiedIndex(index)
-      setTimeout(() => {
-        setCopiedIndex(null)
-      }, 2000)
+      setCopiedIndices(prev => new Set(prev).add(index))
     })
   }
 
@@ -59,10 +57,10 @@ function App() {
                     <span className="item-number">{phone}</span>
                   </div>
                   <button 
-                    className={`btn-copy ${copiedIndex === index ? 'copied' : ''}`}
+                    className={`btn-copy ${copiedIndices.has(index) ? 'copied' : ''}`}
                     onClick={() => handleCopy(phone, index)}
                   >
-                    {copiedIndex === index ? 'Đã copy' : 'Copy'}
+                    {copiedIndices.has(index) ? 'Đã copy' : 'Copy'}
                   </button>
                 </div>
               ))}
